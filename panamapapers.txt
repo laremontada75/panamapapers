@@ -1,0 +1,59 @@
+PANAMA PAPERS
+
+
+ - Question 1) Combien la base de données contient-elle de sociétés offshores différentes dont la source est "Panama Papers" ?
+SELECT COUNT (DISTINCT name) 
+FROM entity 
+WHERE source ='Panama Papers' AND entity.name IS NOT NULL
+
+ - Question 2) Quel intermédiaire a créé le plus de sociétés offshores ? A-t-on son adresse et son pays ?
+SELECT entity.name, intermediary.name, address.address, address.country_codes,
+count(*) as nb_int
+FROM entity, intermediary, address
+WHERE entity.id_address = intermediary.id_address and intermediary.id_address = address.id_address
+GROUP BY intermediary.name
+ORDER BY nb_int DESC
+LIMIT 3
+
+ - Question 3) a)Combien la base contient-elle de bénéficiaires avec un nom unique ? b)Quel est le bénéficiaire dont le nom revient le plus souvent ?
+a) Combien la base contient-elle de bénéficiaires avec un nom unique ?
+SELECT COUNT (DISTINCT name) 
+FROM officer;
+b) Quel est le bénéficiaire dont le nom revient le plus souvent ?
+SELECT officer.name,
+count(*) as nb_name
+FROM officer
+GROUP BY officer.name
+ORDER BY nb_name DESC
+LIMIT 3
+
+ - Question 4) Donner la liste des juridictions avec le nombre d'entreprises offshores enregistrées sur chaque territoire, triée par ordre décroissant.
+SELECT entity.jurisdiction_description,
+count(*) as nb_name
+FROM entity
+GROUP BY entity.jurisdiction_description
+ORDER BY nb_name DESC
+LIMIT 15
+
+ - Question 5) Regrouper les sociétés offshores par statut, et trier la liste par ordre décroissant.
+SELECT entity.status, entity.name
+FROM entity
+ORDER BY entity.status, entity.name DESC,
+
+ - Question 6) Trouver la liste des bénéficiaires dont le nom contient "BNP" et ajouter, pour chaque bénéficiaire, le nom des sociétés offshores.
+SELECT officer.name, entity.name 
+FROM officer, assoc_officer_entity, entity  
+WHERE officer.id = assoc_officer_entity.officer AND assoc_officer_entity.entity = entity.id AND officer.name LIKE '%BNP%';
+
+ - Question 7) Trouver la liste des sociétés dont la juridiction est "France", "Monaco" ou "Réunion".
+SELECT * 
+FROM entity 
+WHERE entity.jurisdiction_description 
+LIKE '%Monaco%' OR entity.jurisdiction_description LIKE '%Reunion%' OR entity.jurisdiction_description LIKE '%Reunion%';
+
+ - Question 8) Trouver la liste des sociétés dont le pays de l'adresse et le pays de la juridiction sont différents.
+ - Question 9) Trouver la liste des bénéficiaires qui ont des sociétés au même nom et enregistrée à la même date, trier la liste par odre décroissant.
+ - Question 10) Donner la liste des intermédiaires qui ont aussi été bénéficiaires, en ajoutant leur nom de bénéficiaire et leur adresse.
+ - Question 12) Donner le top 10 des bénéficiaires qui ont le plus d'identités différentes (similar name and address) et le nombre d'identités correspondant.
+ - Question 13) Donner le top 10 des bénéficiaires qui ont le plus de parts toujours valides dans des entreprises offshores (dont la date de fin n'est pas encore passée).
+ - Question 14) Question bonus : réussir à retrouver dans la base au moins 3 personnalités que tu connais (indice) 😎😎😎
